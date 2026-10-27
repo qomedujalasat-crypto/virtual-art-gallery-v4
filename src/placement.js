@@ -184,9 +184,12 @@ module.exports = (regl, {placements, getAreaIndex}) => {
         mat4.scale(model, model, scale);
         mat4.rotateY(model, model, -angle);
         const textmodel = [];
-        // A slim caption plane sits just below the lower edge of the artwork.
-        mat4.fromTranslation(textmodel, [pos[0], 2.1 - globalScale - 0.42, pos[2]]);
-        mat4.scale(textmodel, textmodel, [1.6, 0.36, 1.6]);
+        // Center the caption on the artwork and place it clearly below its frame,
+        // on the viewer-facing side of the wall.
+        const captionX = pos[0] + (dir[0] / segLen) * width;
+        const captionZ = pos[2] + (dir[1] / segLen) * width;
+        mat4.fromTranslation(textmodel, [captionX, 2.1 - globalScale - 0.30, captionZ]);
+        mat4.scale(textmodel, textmodel, [Math.max(0.9, Math.min(2.2, width * 1.8)), 0.32, 1]);
         mat4.rotateY(textmodel, textmodel, -angle);
         batch[placementIndex] = { ...p, vseg, angle, model, textmodel, text, width, clickHalfHeight: globalScale, textGen:null,
             pos: [...pos], dir: [...dir], segLen, globalScale, horiz, vert };
