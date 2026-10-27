@@ -15,6 +15,8 @@ if (navigator.userAgent.match(/(iPad)|(iPhone)|(iPod)|(android)|(webOS)/i)) {
 }
 var fovY = () => 2 * Math.atan(Math.tan(fovX() * 0.5) * window.innerHeight / window.innerWidth);
 
+const mat4 = require('gl-mat4');
+const drawText = require('./text').draw;
 const Stats = require('stats.js');
 var stats = new Stats();
 stats.showPanel(0);
@@ -43,6 +45,29 @@ drawMap = mesh(regl, map, useReflexion);
 placement = require('./placement')(regl, map);
 drawPainting = require('./painting')(regl);
 fps = require('./fps')(map, fovY);
+
+// Fixed world-space inscription on the entrance signboard.
+const drawEntranceInscription = drawText(regl);
+const signCanvas = document.createElement('canvas');
+signCanvas.width = 1024;
+signCanvas.height = 256;
+const signContext = signCanvas.getContext('2d');
+signContext.clearRect(0, 0, signCanvas.width, signCanvas.height);
+signContext.direction = 'rtl';
+signContext.textAlign = 'center';
+signContext.textBaseline = 'middle';
+signContext.fillStyle = '#f5df9a';
+signContext.shadowColor = 'rgba(0,0,0,0.5)';
+signContext.shadowBlur = 3;
+signContext.font = 'bold 48px Tahoma, Arial, sans-serif';
+signContext.fillText('دومین جشنواره کشوری', 512, 83, 950);
+signContext.font = 'bold 43px Tahoma, Arial, sans-serif';
+signContext.fillText('طراحی و دوخت لباس دانش‌آموزی', 512, 174, 950);
+const signTexture = regl.texture({ data: signCanvas, min: 'linear', mag: 'linear', flipY: true });
+const signModel = mat4.identity([]);
+mat4.translate(signModel, signModel, [19.9, 4.74, 0.48]);
+mat4.scale(signModel, signModel, [8.2, 2.05, 1]);
+const entranceInscription = [{ text: signTexture, textmodel: signModel }];
 
 const context = regl({
 	cull: {
@@ -173,6 +198,7 @@ regl.frame(({
 		}
 		drawMap();
 		drawPainting(placement.batch());
+		drawEntranceInscription(entranceInscription);
 	});
 	stats.end();
 });
