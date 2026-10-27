@@ -269,6 +269,18 @@ module.exports = function (n = mapSize, r = cellSize, w = wallThickness, m = wal
 		.map(([[x1, y1], [x2, y2]]) => [Math.sign(y1 - y2), 0, Math.sign(x2 - x1)])
 		.flatMap((v) => Array(4).fill(v));
 	let position = segments.flat().flatMap(([x, y]) => [[x, 0, y], [x, h, y]]);
+	// Add reverse-facing surfaces for the three interior partitions so both sides render
+	// with back-face culling enabled; do not duplicate artwork placement segments.
+	const interiorPartitions = [
+		[[0, s * 0.25], [s - gap, s * 0.25]],
+		[[gap, s * 0.50], [s, s * 0.50]],
+		[[0, s * 0.75], [s - gap, s * 0.75]]
+	];
+	interiorPartitions.forEach(([[x1, z1], [x2, z2]]) => {
+		position.push([x2, 0, z2], [x2, h, z2], [x1, 0, z1], [x1, h, z1]);
+		const reverseNormal = [Math.sign(z2 - z1), 0, Math.sign(x1 - x2)];
+		for (let i = 0; i < 4; i++) normal.push(reverseNormal);
+	});
 	let {getAreaIndex, getGridSegments, getGridParts, placements} = genGrid(segments, n, r);
 	// Keep the entry corridor walls clear for the park panorama instead of placing artworks on them.
 	placements = placements.filter(([[ax, az], [bx, bz]]) => {
