@@ -1,6 +1,7 @@
 'use strict';
 const texture = require('./image');
 const mat4 = require('gl-mat4');
+const labelTexture = require('./text');
 
 const renderDist = 40;
 const loadDist = 20;
@@ -168,7 +169,8 @@ module.exports = (regl, {placements, getAreaIndex}) => {
             2 * width * horiz + 0.1 * vert,
             2 * globalScale,
             2 * width * vert + 0.1 * horiz];
-        const text = null;
+        // Render the actual image filename as a readable label beneath each artwork.
+        const text = labelTexture.init(regl.texture, p.file, width);
         const d1 = width / segLen;
         const d2 = 0.005 / Math.hypot(norm[0], norm[1]);
         const vseg = [
@@ -182,8 +184,9 @@ module.exports = (regl, {placements, getAreaIndex}) => {
         mat4.scale(model, model, scale);
         mat4.rotateY(model, model, -angle);
         const textmodel = [];
-        mat4.fromTranslation(textmodel, [pos[0], 2.1 + globalScale, pos[2]]);
-        mat4.scale(textmodel, textmodel, [2,2,2]);
+        // A slim caption plane sits just below the lower edge of the artwork.
+        mat4.fromTranslation(textmodel, [pos[0], 2.1 - globalScale - 0.42, pos[2]]);
+        mat4.scale(textmodel, textmodel, [1.6, 0.36, 1.6]);
         mat4.rotateY(textmodel, textmodel, -angle);
         batch[placementIndex] = { ...p, vseg, angle, model, textmodel, text, width, clickHalfHeight: globalScale, textGen:null,
             pos: [...pos], dir: [...dir], segLen, globalScale, horiz, vert };
