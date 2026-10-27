@@ -65,7 +65,7 @@ signContext.font = 'bold 54px Tahoma, Arial, sans-serif';
 signContext.fillText('طراحی و دوخت لباس دانش‌آموزی', 512, 174, 950);
 const signTexture = regl.texture({ data: signCanvas, min: 'linear', mag: 'linear', flipY: true });
 const signModel = mat4.identity([]);
-mat4.translate(signModel, signModel, [19.8, 5.18, 0.17]); // Place lettering on the viewer-facing side of the signboard.
+mat4.translate(signModel, signModel, [19.8, 5.18, 0.59]); // Place lettering on the viewer-facing side of the signboard.
 mat4.scale(signModel, signModel, [8.4, 1.16, 1]);
 const entranceInscription = [{ text: signTexture, textmodel: signModel }];
 
