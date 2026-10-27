@@ -49,6 +49,40 @@ module.exports = (regl, data, useReflexion) => {
                 float vein = pow(1.0 - abs(pattern), 18.0);
                 totalLight = mix(totalLight, vec3(0.55, 0.52, 0.47), vein * 0.12);
             } else {
+                bool parkWall = (abs(v_pos.x - 18.24) < 0.09 || abs(v_pos.x - 29.76) < 0.09)
+                    && v_pos.z > 0.35 && v_pos.z < 7.85
+                    && v_pos.y > 0.72 && v_pos.y < 5.65;
+                bool portalFrame = v_pos.z > -0.15 && v_pos.z < 0.75
+                    && v_pos.x > 17.7 && v_pos.x < 30.3 && v_pos.y > 3.7;
+                if (parkWall) {
+                    // A framed, flat park panorama painted on each corridor wall.
+                    vec2 uv = vec2((v_pos.z - 0.42) / 7.35, (v_pos.y - 0.78) / 4.78);
+                    float edge = min(min(uv.x, 1.0-uv.x), min(uv.y, 1.0-uv.y));
+                    if (edge < 0.035) {
+                        totalLight = vec3(0.72, 0.53, 0.25);
+                    } else {
+                        float skyMix = smoothstep(0.42, 0.95, uv.y);
+                        vec3 sky = mix(vec3(0.77, 0.84, 0.86), vec3(0.35, 0.66, 0.83), skyMix);
+                        float distantHill = 0.36 + 0.055 * sin(uv.x * 10.0) + 0.025 * sin(uv.x * 23.0);
+                        float nearHill = 0.23 + 0.045 * sin(uv.x * 8.0 + 1.1) + 0.025 * sin(uv.x * 18.0);
+                        vec3 landscape = mix(vec3(0.20, 0.43, 0.25), vec3(0.31, 0.55, 0.30), smoothstep(nearHill-0.02, nearHill+0.02, uv.y));
+                        landscape = mix(vec3(0.13, 0.34, 0.22), landscape, smoothstep(distantHill-0.025, distantHill+0.025, uv.y));
+                        totalLight = mix(landscape, sky, smoothstep(distantHill, distantHill+0.025, uv.y));
+                        // Repeated tree canopies and trunks give the flat landscape a park-like silhouette.
+                        float treeX = fract(uv.x * 7.0);
+                        float canopy = step(length(vec2(treeX - 0.5, uv.y - (0.38 + 0.025*sin(uv.x*35.0))) * vec2(2.1, 3.0)), 0.34);
+                        float trunk = step(abs(treeX - 0.5), 0.035) * step(0.20, uv.y) * (1.0-step(0.34, uv.y));
+                        totalLight = mix(totalLight, vec3(0.12, 0.31, 0.16), canopy * 0.72);
+                        totalLight = mix(totalLight, vec3(0.31, 0.20, 0.11), trunk);
+                        float path = 1.0 - smoothstep(0.02, 0.20, abs(uv.x - 0.5));
+                        path *= 1.0 - smoothstep(0.15, 0.42, uv.y);
+                        totalLight = mix(totalLight, vec3(0.72, 0.65, 0.49), path * 0.58);
+                    }
+                } else if (portalFrame) {
+                    // Deep walnut portal with a restrained gold sign frame.
+                    bool signFace = v_pos.x > 19.8 && v_pos.x < 28.2 && v_pos.y > 5.25 && v_pos.y < 6.28;
+                    totalLight = signFace ? vec3(0.20, 0.105, 0.045) : vec3(0.31, 0.19, 0.09);
+                } else {
                 // Medium warm wood with layered grain, subtle pores, knots, and clear board seams.
                 vec2 woodUV = vec2(v_pos.x + v_pos.z, v_pos.y);
                 float boardHeight = 0.62;
@@ -101,6 +135,7 @@ module.exports = (regl, data, useReflexion) => {
 
                 // Keep the wall in a natural medium-brown range without washing out the detail.
                 totalLight *= 0.99 + 0.015 * smoothstep(0.1, 0.12, v_pos.y);
+                }
             }
 
             float alpha = .98 + smoothstep(150., 0., dist) - v_normal.y;
