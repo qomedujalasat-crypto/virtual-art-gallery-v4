@@ -1,6 +1,7 @@
 const textHeight = 38;
 const textCanvas = document.createElement('canvas');
-const maxWidth = textCanvas.width = textCanvas.height = 1024;
+const maxWidth = textCanvas.width = 512;
+textCanvas.height = 128;
 const ctx = textCanvas.getContext('2d');
 ctx.mozImageSmoothingEnabled = false;
 ctx.webkitImageSmoothingEnabled = false;
@@ -25,8 +26,8 @@ module.exports = {
         const paddingY = 8;
         const labelHeight = fontSize + paddingY * 2;
         // Shift the caption slightly left so it sits more naturally beneath the artwork.
-        const centerX = textCanvas.width / 2 - 38;
-        const centerY = textCanvas.height - 62;
+        const centerX = textCanvas.width / 2;
+        const centerY = textCanvas.height / 2;
 
         // Opaque white label behind dark text; the rest of the canvas stays transparent.
         ctx.fillStyle = "#ffffff";
