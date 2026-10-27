@@ -244,27 +244,10 @@ module.exports = function (n = mapSize, r = cellSize, w = wallThickness, m = wal
 		[[0,0],[s*0.38,0]], [[s*0.62,0],[s,0]],
 		[[s,0],[s,s]], [[s,s],[0,s]], [[0,s],[0,0]]
 	];
-	const gap = s * 0.12;
-	const addHorizontalWall = (z, gapAtRight) => {
-		if (gapAtRight) {
-			segments.push([[0,z],[s-gap,z]]);
-		} else {
-			segments.push([[gap,z],[s,z]]);
-		}
-	};
-	// Three full-width partitions with alternating openings create a clear W/serpentine route.
-	addHorizontalWall(s * 0.25, true);
-	addHorizontalWall(s * 0.50, false);
-	addHorizontalWall(s * 0.75, true);
-
-	// Short side walls form a simple entry corridor inside the gallery only.
-	// Their surfaces carry a flat park panorama; no exterior geometry is changed.
+	// Simple square gallery: keep the outer perimeter and the central entrance opening.
 	const entranceLeft = s * 0.38;
 	const entranceRight = s * 0.62;
 	const corridorLength = 8;
-	// Keep the right-hand inner return wall only; the left-hand wall was the
-	// unwanted extra wall beside the entrance when entering from the park.
-	segments.push([[entranceRight, 0], [entranceRight, corridorLength]]);
 	console.time('gen mesh');
 	let normal = segments
 		.map(([[x1, y1], [x2, y2]]) => [Math.sign(y1 - y2), 0, Math.sign(x2 - x1)])
@@ -281,25 +264,7 @@ module.exports = function (n = mapSize, r = cellSize, w = wallThickness, m = wal
 		const reverseNormal = [Math.sign(z2 - z1), 0, Math.sign(x1 - x2)];
 		for (let i = 0; i < 4; i++) normal.push(reverseNormal);
 	});
-	// Add reverse-facing surfaces for the three interior partitions so both sides render
-	// with back-face culling enabled; do not duplicate artwork placement segments.
-	const interiorPartitions = [
-		[[0, s * 0.25], [s - gap, s * 0.25]],
-		[[gap, s * 0.50], [s, s * 0.50]],
-		[[0, s * 0.75], [s - gap, s * 0.75]]
-	];
-	interiorPartitions.forEach(([[x1, z1], [x2, z2]]) => {
-		position.push([x2, 0, z2], [x2, h, z2], [x1, 0, z1], [x1, h, z1]);
-		const reverseNormal = [Math.sign(z2 - z1), 0, Math.sign(x1 - x2)];
-		for (let i = 0; i < 4; i++) normal.push(reverseNormal);
-	});
 	let {getAreaIndex, getGridSegments, getGridParts, placements} = genGrid(segments, n, r);
-	// Keep the entry corridor walls clear for the park panorama instead of placing artworks on them.
-	placements = placements.filter(([[ax, az], [bx, bz]]) => {
-		const cx = (ax + bx) * 0.5, cz = (az + bz) * 0.5;
-		const sideWall = Math.abs(cx - entranceRight) < 0.2;
-		return !(sideWall && cz >= 0 && cz <= corridorLength);
-	});
 	//Add floor and ceilling
 	normal.push([0, -1, 0], [0, -1, 0], [0, -1, 0], [0, -1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0]);
 	position.push([0, h, 0], [0, h, s], [s, h, 0], [s, h, s], [0, 0, 0], [s, 0, 0], [0, 0, s], [s, 0, s]);
