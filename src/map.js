@@ -279,6 +279,17 @@ module.exports = function (n = mapSize, r = cellSize, w = wallThickness, m = wal
 	//Add floor and ceilling
 	normal.push([0, -1, 0], [0, -1, 0], [0, -1, 0], [0, -1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0]);
 	position.push([0, h, 0], [0, h, s], [s, h, 0], [s, h, s], [0, 0, 0], [s, 0, 0], [0, 0, s], [s, 0, s]);
+	// Open-air park approach outside the entrance: a real walkable ground plane and distant horizon.
+	// This is separate from the gallery floor and leaves the portal and interior layout untouched.
+	const parkDepth = 30;
+	const parkSkyHeight = 13;
+	const addExteriorQuad = (a, b, c, d, nrm) => {
+		[a, b, c, d].forEach(p => position.push(p));
+		for (let i = 0; i < 4; i++) normal.push(nrm);
+	};
+	addExteriorQuad([0, 0, -parkDepth], [s, 0, -parkDepth], [0, 0, 0], [s, 0, 0], [0, 1, 0]);
+	addExteriorQuad([0, 0, -parkDepth], [0, parkSkyHeight, -parkDepth], [s, 0, -parkDepth], [s, parkSkyHeight, -parkDepth], [0, 0, 1]);
+
 	// Three-dimensional Iranian-style entrance portal at the open gap in the front wall.
 	// This geometry is rendered in the gallery itself, independently of the welcome overlay.
 	const portalCenterX = s * 0.5;
