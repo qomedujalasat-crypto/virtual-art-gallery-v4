@@ -186,7 +186,7 @@ regl.frame(({
 	});
 	placement.update(fps.pos, fps.fmouse[1], fovX());
 	regl.clear({
-		color: [0, 0, 0, 1],
+		color: [0.48, 0.75, 0.94, 1], // Daylight blue fallback outside the horizon mesh
 		depth: 1
 	});
 	context(() => {
