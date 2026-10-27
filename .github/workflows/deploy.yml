@@ -39,6 +39,12 @@ jobs:
           cp build.html public/index.html
           cp -R images public/images
 
+      - name: Install image optimizer
+        run: npm install --no-save sharp
+
+      - name: Generate lightweight WebP display images
+        run: node scripts/optimize-images.js
+
       - name: Upload website
         uses: actions/upload-pages-artifact@v3
         with:
