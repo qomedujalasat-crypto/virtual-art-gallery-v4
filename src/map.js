@@ -237,15 +237,23 @@ function genGrid(segments, n, r) {
 
 module.exports = function (n = mapSize, r = cellSize, w = wallThickness, m = wallRemoval, h = mapHeight) {
 	let s = r * Math.pow(2, n);
-	// W-like serpentine gallery outline: three long parallel runs connected
-	// by right-angle turns. Keep the footprint deterministic and avoid diagonal walls.
-	let border = [
-		[0, 0], [1, 0], [1, 1], [3 / 4, 1],
-		[3 / 4, 1 / 4], [1 / 2, 1 / 4], [1 / 2, 1],
-		[1 / 4, 1], [1 / 4, 1 / 4], [0, 1 / 4], [0, 0]
-	].map(([x, y]) => [x * s, y * s]);
-	console.time('gen mesh');
+	// A real serpentine gallery: outer perimeter plus three long inner walls.
+	// Alternating door gaps connect the lanes so the visitor walks back and forth.
+	const border = [[0,0],[s,0],[s,s],[0,s],[0,0]].map(([x,y]) => [x,y]);
 	let segments = border.slice(0, -1).map((p, i) => [p, border[i + 1]]);
+	const gap = s * 0.12;
+	const addHorizontalWall = (z, gapAtRight) => {
+		if (gapAtRight) {
+			segments.push([[0,z],[s-gap,z]]);
+		} else {
+			segments.push([[gap,z],[s,z]]);
+		}
+	};
+	// Three full-width partitions with alternating openings create a clear W/serpentine route.
+	addHorizontalWall(s * 0.25, true);
+	addHorizontalWall(s * 0.50, false);
+	addHorizontalWall(s * 0.75, true);
+	console.time('gen mesh');
 	let normal = segments
 		.map(([[x1, y1], [x2, y2]]) => [Math.sign(y1 - y2), 0, Math.sign(x2 - x1)])
 		.flatMap((v) => Array(4).fill(v));
