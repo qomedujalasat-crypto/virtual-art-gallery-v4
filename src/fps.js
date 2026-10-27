@@ -62,24 +62,11 @@ const easeInOutQuad = x =>
 	x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
 
 module.exports = function ({getGridSegments, getGridParts, placements}, fovY) {
-	// Start in front of the first painting; placements[0] receives images/1.jpg first.
-	const firstWall = placements && placements[0];
-	let startX = 18, startZ = 18;
-	let startYaw = Math.PI * 3 / 4;
-	if (firstWall) {
-		const [a, b] = firstWall;
-		const midX = (a[0] + b[0]) / 2;
-		const midZ = (a[1] + b[1]) / 2;
-		const dx = b[0] - a[0], dz = b[1] - a[1];
-		// The painting is offset to the negative side of this segment normal in placement.js.
-		const nx = dz, nz = -dx;
-		const normalLen = Math.hypot(nx, nz) || 1;
-		startX = midX - (nx / normalLen) * 3.5;
-		startZ = midZ - (nz / normalLen) * 3.5;
-		// View-matrix yaw: atan2(targetX - cameraX, cameraZ - targetZ).
-		// Do not add PI; that turns the camera away from the painting.
-		startYaw = Math.atan2(midX - startX, startZ - midZ);
-	}
+	// Begin just inside the main entrance, facing the 3D portal.
+	// The portal is centered on the front opening at z ~= 0.
+	const mapExtent = 6 * Math.pow(2, 3);
+	let startX = mapExtent * 0.5, startZ = 4.8;
+	let startYaw = 0;
 	var mouse = [0, startYaw];
 	var fmouse = [0, startYaw];
 	var dir = [0, 0, 0];
