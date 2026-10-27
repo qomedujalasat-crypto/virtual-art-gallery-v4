@@ -9,6 +9,15 @@
       html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; }
       #welcome-overlay { position: fixed; inset: 0; z-index: 2147483646; display: flex; align-items: center; justify-content: center; padding: 24px; box-sizing: border-box; background: rgba(18,16,13,.42); opacity: 1; visibility: visible; transition: opacity .7s ease, visibility .7s ease; pointer-events: none; }
       #welcome-overlay.is-hidden { opacity: 0; visibility: hidden; }
+      .entrance-stage { display:flex; flex-direction:column; align-items:center; gap:22px; width:min(92vw,850px); }
+      .entrance-arch { position:relative; width:min(68vw,520px); height:min(58vh,440px); min-height:270px; border:14px solid #b58a4f; border-bottom:0; border-radius:260px 260px 0 0; box-sizing:border-box; background:linear-gradient(180deg,rgba(255,246,220,.12),rgba(15,12,9,.3)); box-shadow:0 0 0 5px rgba(39,27,15,.7),0 0 36px rgba(227,188,111,.35); overflow:hidden; }
+      .entrance-arch:before { content:""; position:absolute; inset:0; background:linear-gradient(90deg,transparent 49.5%,rgba(242,217,168,.8) 50%,transparent 50.5%); pointer-events:none; }
+      .door-leaf { position:absolute; bottom:0; width:43%; height:77%; border:5px solid #d0ad72; box-sizing:border-box; background:repeating-linear-gradient(90deg,#53351f 0,#53351f 22%,#68472a 23%,#68472a 25%); box-shadow:inset 0 0 0 4px rgba(20,12,7,.6); }
+      .door-leaf.left { left:0; transform:perspective(500px) rotateY(27deg); transform-origin:left center; }
+      .door-leaf.right { right:0; transform:perspective(500px) rotateY(-27deg); transform-origin:right center; }
+      .door-leaf:after { content:""; position:absolute; top:48%; width:9px; height:9px; border-radius:50%; background:#e5c27e; box-shadow:0 0 7px rgba(255,220,140,.6); }
+      .door-leaf.left:after { right:12px; } .door-leaf.right:after { left:12px; }
+      .entrance-hint { color:#fff7e5; font:600 16px/1.8 Tahoma,Arial,sans-serif; text-align:center; text-shadow:0 2px 5px #000; }
       .welcome-title { max-width: 900px; padding: 24px 30px; border: 1px solid rgba(224,202,157,.85); border-radius: 14px; background: rgba(38,31,23,.88); box-shadow: 0 8px 30px rgba(0,0,0,.28); color: #fff8e9; text-align: center; font-family: Tahoma,Arial,sans-serif; font-size: clamp(20px,3vw,34px); font-weight: 600; line-height: 1.9; }
       @media (max-width: 600px) { .welcome-title { padding: 20px 18px; border-radius: 12px; line-height: 1.8; } }
       .gallery-actions {
@@ -45,7 +54,7 @@
     </style>
   </head>
   <body>
-    <div id="welcome-overlay" role="status" aria-live="polite"><div class="welcome-title">نمایشگاه مجازی دومین جشنواره کشوری طراحی و دوخت لباس دانش‌آموزی قم ـ ۱۴۰۵</div></div>
+    <div id="welcome-overlay" role="status" aria-live="polite"><div class="entrance-stage"><div class="welcome-title">نمایشگاه مجازی دومین جشنواره کشوری طراحی و دوخت لباس دانش‌آموزی قم ـ ۱۴۰۵</div><div class="entrance-arch" aria-label="سردر ورودی با دو لنگه در باز"><div class="door-leaf left"></div><div class="door-leaf right"></div></div><div class="entrance-hint">به نمایشگاه خوش آمدید؛ با حرکت ماوس یا کلیدهای جهت‌دار وارد شوید</div></div></div>
     <nav class="gallery-actions" aria-label="امکانات نمایشگاه">
       <button class="action-button" id="download-artwork" type="button">دانلود تصویر اثر</button>
       <a class="action-button survey-link" href="https://digiform.ir/wab710d2e6" target="_blank" rel="noopener noreferrer">شرکت در نظرسنجی</a>
