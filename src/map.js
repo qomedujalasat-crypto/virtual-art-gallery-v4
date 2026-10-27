@@ -239,8 +239,11 @@ module.exports = function (n = mapSize, r = cellSize, w = wallThickness, m = wal
 	let s = r * Math.pow(2, n);
 	// A real serpentine gallery: outer perimeter plus three long inner walls.
 	// Alternating door gaps connect the lanes so the visitor walks back and forth.
-	const border = [[0,0],[s,0],[s,s],[0,s],[0,0]].map(([x,y]) => [x,y]);
-	let segments = border.slice(0, -1).map((p, i) => [p, border[i + 1]]);
+	const border = [[0,0],[s,s*0.38],[s,0],[s,s],[0,s],[0,0]].map(([x,y]) => [x,y]);
+	let segments = [
+		[[0,0],[s*0.38,0]], [[s*0.62,0],[s,0]],
+		[[s,0],[s,s]], [[s,s],[0,s]], [[0,s],[0,0]]
+	];
 	const gap = s * 0.12;
 	const addHorizontalWall = (z, gapAtRight) => {
 		if (gapAtRight) {
