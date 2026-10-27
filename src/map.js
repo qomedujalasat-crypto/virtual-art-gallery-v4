@@ -256,12 +256,26 @@ module.exports = function (n = mapSize, r = cellSize, w = wallThickness, m = wal
 	addHorizontalWall(s * 0.25, true);
 	addHorizontalWall(s * 0.50, false);
 	addHorizontalWall(s * 0.75, true);
+
+	// Short side walls form a simple entry corridor inside the gallery only.
+	// Their surfaces carry a flat park panorama; no exterior geometry is changed.
+	const entranceLeft = s * 0.38;
+	const entranceRight = s * 0.62;
+	const corridorLength = 8;
+	segments.push([[entranceLeft, 0], [entranceLeft, corridorLength]]);
+	segments.push([[entranceRight, 0], [entranceRight, corridorLength]]);
 	console.time('gen mesh');
 	let normal = segments
 		.map(([[x1, y1], [x2, y2]]) => [Math.sign(y1 - y2), 0, Math.sign(x2 - x1)])
 		.flatMap((v) => Array(4).fill(v));
 	let position = segments.flat().flatMap(([x, y]) => [[x, 0, y], [x, h, y]]);
 	let {getAreaIndex, getGridSegments, getGridParts, placements} = genGrid(segments, n, r);
+	// Keep the entry corridor walls clear for the park panorama instead of placing artworks on them.
+	placements = placements.filter(([[ax, az], [bx, bz]]) => {
+		const cx = (ax + bx) * 0.5, cz = (az + bz) * 0.5;
+		const sideWall = Math.abs(cx - entranceLeft) < 0.2 || Math.abs(cx - entranceRight) < 0.2;
+		return !(sideWall && cz >= 0 && cz <= corridorLength);
+	});
 	//Add floor and ceilling
 	normal.push([0, -1, 0], [0, -1, 0], [0, -1, 0], [0, -1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0]);
 	position.push([0, h, 0], [0, h, s], [s, h, 0], [s, h, s], [0, 0, 0], [s, 0, 0], [0, 0, s], [s, 0, s]);
@@ -273,6 +287,7 @@ module.exports = function (n = mapSize, r = cellSize, w = wallThickness, m = wal
 	const portalRadius = portalWidth * 0.5;
 	const pillarHeight = h * 0.66;
 	const portalTop = h * 0.94;
+	const archRise = portalTop - pillarHeight;
 	const frameDepth = 0.34;
 	const addPortalQuad = (a, b, c, d, nrm) => {
 		[a, b, c, d].forEach(p => position.push(p));
@@ -295,14 +310,25 @@ module.exports = function (n = mapSize, r = cellSize, w = wallThickness, m = wal
 	for (let i = 0; i < archSegments; i++) {
 		const a0 = Math.PI * i / archSegments;
 		const a1 = Math.PI * (i + 1) / archSegments;
-		const inner0 = [portalCenterX + Math.cos(a0) * portalRadius, pillarHeight + Math.sin(a0) * portalRadius, portalZ];
-		const inner1 = [portalCenterX + Math.cos(a1) * portalRadius, pillarHeight + Math.sin(a1) * portalRadius, portalZ];
-		const outer0 = [portalCenterX + Math.cos(a0) * outerRadius, pillarHeight + Math.sin(a0) * outerRadius, portalZ];
-		const outer1 = [portalCenterX + Math.cos(a1) * outerRadius, pillarHeight + Math.sin(a1) * outerRadius, portalZ];
+		// A shallow Persian-style arch that stays below the gallery ceiling.
+		const inner0 = [portalCenterX + Math.cos(a0) * portalRadius, pillarHeight + Math.sin(a0) * archRise, portalZ];
+		const inner1 = [portalCenterX + Math.cos(a1) * portalRadius, pillarHeight + Math.sin(a1) * archRise, portalZ];
+		const outer0 = [portalCenterX + Math.cos(a0) * outerRadius, pillarHeight + Math.sin(a0) * (archRise + frameDepth * 0.32), portalZ];
+		const outer1 = [portalCenterX + Math.cos(a1) * outerRadius, pillarHeight + Math.sin(a1) * (archRise + frameDepth * 0.32), portalZ];
 		addPortalQuad(inner0, inner1, outer0, outer1, [0,0,1]);
 		addPortalQuad([inner0[0],inner0[1],portalZ+frameDepth],[inner1[0],inner1[1],portalZ+frameDepth],
 			[outer0[0],outer0[1],portalZ+frameDepth],[outer1[0],outer1[1],portalZ+frameDepth],[0,0,-1]);
 	}
+	// Framed wooden signboard nested above the doors, within the arch and below the ceiling.
+	const signLeft = portalCenterX - portalRadius * 0.70;
+	const signRight = portalCenterX + portalRadius * 0.70;
+	addPortalBox(signLeft - 0.12, 5.18, portalZ - 0.03, signRight + 0.12, 6.34, portalZ + frameDepth + 0.05);
+	// Fine gold edging around the signboard.
+	addPortalBox(signLeft - 0.12, 5.18, portalZ - 0.07, signRight + 0.12, 5.28, portalZ + frameDepth + 0.09);
+	addPortalBox(signLeft - 0.12, 6.24, portalZ - 0.07, signRight + 0.12, 6.34, portalZ + frameDepth + 0.09);
+	addPortalBox(signLeft - 0.12, 5.18, portalZ - 0.07, signLeft - 0.02, 6.34, portalZ + frameDepth + 0.09);
+	addPortalBox(signRight + 0.02, 5.18, portalZ - 0.07, signRight + 0.12, 6.34, portalZ + frameDepth + 0.09);
+
 	// Two open wooden door leaves, angled outward into the entrance space.
 	const doorHeight = pillarHeight * 0.91;
 	const hingeLeft = portalCenterX - portalRadius;
