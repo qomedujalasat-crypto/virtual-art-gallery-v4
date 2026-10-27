@@ -40,6 +40,16 @@ module.exports = (regl, data, useReflexion) => {
                 vec3 panelWhite = vec3(0.98, 0.98, 0.96);
                 totalLight = mix(ceilingBase, panelWhite, lightPanel);
             } else if (v_normal.y > 0.5) {
+                if (v_pos.z < -0.02) {
+                    // Outdoor park ground: grass on both sides of a broad, light pedestrian path.
+                    vec3 grass = vec3(0.24, 0.43, 0.22);
+                    float variation = 0.025 * sin(v_pos.x * 1.7 + v_pos.z * 0.9)
+                        + 0.018 * sin(v_pos.x * 3.8 - v_pos.z * 1.3);
+                    grass += vec3(variation, variation * 1.15, variation * 0.65);
+                    float pathWidth = 2.0 + abs(v_pos.z) * 0.13;
+                    float pathMask = 1.0 - smoothstep(pathWidth, pathWidth + 0.45, abs(v_pos.x - 24.0));
+                    totalLight = mix(grass, vec3(0.70, 0.64, 0.51), pathMask);
+                } else {
                 // Keep the marble floor muted so the artwork, not the room, draws attention.
                 vec3 stone = vec3(0.76, 0.73, 0.68);
                 vec3 textureColor = texture2D(floorTexture, v_pos.xz / 8.0).rgb;
@@ -48,7 +58,18 @@ module.exports = (regl, data, useReflexion) => {
                     + sin(v_pos.x * 0.7 + v_pos.z * 0.3) * 2.0);
                 float vein = pow(1.0 - abs(pattern), 18.0);
                 totalLight = mix(totalLight, vec3(0.55, 0.52, 0.47), vein * 0.12);
+                }
             } else {
+                if (v_normal.z > 0.5 && v_pos.z < -29.9) {
+                    // Daylight sky and rolling green horizon; no tree models are needed.
+                    float skyMix = smoothstep(0.38, 0.98, v_pos.y / 13.0);
+                    vec3 sky = mix(vec3(0.80, 0.88, 0.91), vec3(0.38, 0.68, 0.86), skyMix);
+                    float farHill = 3.2 + 0.65 * sin(v_pos.x * 0.17) + 0.28 * sin(v_pos.x * 0.39 + 1.2);
+                    float nearHill = 1.65 + 0.42 * sin(v_pos.x * 0.12 + 1.0) + 0.22 * sin(v_pos.x * 0.31);
+                    vec3 hillColor = mix(vec3(0.20, 0.42, 0.25), vec3(0.34, 0.55, 0.31), smoothstep(nearHill - 0.1, nearHill + 0.1, v_pos.y));
+                    hillColor = mix(vec3(0.17, 0.36, 0.24), hillColor, smoothstep(farHill - 0.1, farHill + 0.1, v_pos.y));
+                    totalLight = mix(hillColor, sky, smoothstep(4.2, 5.0, v_pos.y));
+                } else {
                 bool parkWall = (abs(v_pos.x - 18.24) < 0.09 || abs(v_pos.x - 29.76) < 0.09)
                     && v_pos.z > 0.35 && v_pos.z < 7.85
                     && v_pos.y > 0.72 && v_pos.y < 5.65;
@@ -135,6 +156,7 @@ module.exports = (regl, data, useReflexion) => {
 
                 // Keep the wall in a natural medium-brown range without washing out the detail.
                 totalLight *= 0.99 + 0.015 * smoothstep(0.1, 0.12, v_pos.y);
+                }
                 }
             }
 
