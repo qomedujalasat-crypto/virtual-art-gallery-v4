@@ -265,6 +265,67 @@ module.exports = function (n = mapSize, r = cellSize, w = wallThickness, m = wal
 	//Add floor and ceilling
 	normal.push([0, -1, 0], [0, -1, 0], [0, -1, 0], [0, -1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0]);
 	position.push([0, h, 0], [0, h, s], [s, h, 0], [s, h, s], [0, 0, 0], [s, 0, 0], [0, 0, s], [s, 0, s]);
+	// Three-dimensional Iranian-style entrance portal at the open gap in the front wall.
+	// This geometry is rendered in the gallery itself, independently of the welcome overlay.
+	const portalCenterX = s * 0.5;
+	const portalZ = 0.18;
+	const portalWidth = s * 0.24;
+	const portalRadius = portalWidth * 0.5;
+	const pillarHeight = h * 0.66;
+	const portalTop = h * 0.94;
+	const frameDepth = 0.34;
+	const addPortalQuad = (a, b, c, d, nrm) => {
+		[a, b, c, d].forEach(p => position.push(p));
+		for (let i = 0; i < 4; i++) normal.push(nrm);
+	};
+	const addPortalBox = (x1, y1, z1, x2, y2, z2) => {
+		// Front and rear faces, plus the two narrow side faces; each quad uses the mesh's standard indexing.
+		addPortalQuad([x1,y1,z1],[x2,y1,z1],[x1,y2,z1],[x2,y2,z1],[0,0,1]);
+		addPortalQuad([x2,y1,z2],[x1,y1,z2],[x2,y2,z2],[x1,y2,z2],[0,0,-1]);
+		addPortalQuad([x1,y1,z2],[x1,y1,z1],[x1,y2,z2],[x1,y2,z1],[-1,0,0]);
+		addPortalQuad([x2,y1,z1],[x2,y1,z2],[x2,y2,z1],[x2,y2,z2],[1,0,0]);
+	};
+	// Solid carved-looking jambs and a segmented curved arch ring.
+	addPortalBox(portalCenterX - portalRadius - frameDepth, 0, portalZ,
+		portalCenterX - portalRadius, pillarHeight, portalZ + frameDepth);
+	addPortalBox(portalCenterX + portalRadius, 0, portalZ,
+		portalCenterX + portalRadius + frameDepth, pillarHeight, portalZ + frameDepth);
+	const archSegments = 20;
+	const outerRadius = portalRadius + frameDepth;
+	for (let i = 0; i < archSegments; i++) {
+		const a0 = Math.PI * i / archSegments;
+		const a1 = Math.PI * (i + 1) / archSegments;
+		const inner0 = [portalCenterX + Math.cos(a0) * portalRadius, pillarHeight + Math.sin(a0) * portalRadius, portalZ];
+		const inner1 = [portalCenterX + Math.cos(a1) * portalRadius, pillarHeight + Math.sin(a1) * portalRadius, portalZ];
+		const outer0 = [portalCenterX + Math.cos(a0) * outerRadius, pillarHeight + Math.sin(a0) * outerRadius, portalZ];
+		const outer1 = [portalCenterX + Math.cos(a1) * outerRadius, pillarHeight + Math.sin(a1) * outerRadius, portalZ];
+		addPortalQuad(inner0, inner1, outer0, outer1, [0,0,1]);
+		addPortalQuad([inner0[0],inner0[1],portalZ+frameDepth],[inner1[0],inner1[1],portalZ+frameDepth],
+			[outer0[0],outer0[1],portalZ+frameDepth],[outer1[0],outer1[1],portalZ+frameDepth],[0,0,-1]);
+	}
+	// Two open wooden door leaves, angled outward into the entrance space.
+	const doorHeight = pillarHeight * 0.91;
+	const hingeLeft = portalCenterX - portalRadius;
+	const hingeRight = portalCenterX + portalRadius;
+	const leafLength = portalRadius * 0.78;
+	const leafAngle = 0.78;
+	const makeDoorLeaf = (hingeX, sign) => {
+		const endX = hingeX + sign * Math.cos(leafAngle) * leafLength;
+		const endZ = portalZ - Math.sin(leafAngle) * leafLength;
+		const thickness = 0.12;
+		const p0 = [hingeX, 0, portalZ];
+		const p1 = [endX, 0, endZ];
+		const p2 = [hingeX, doorHeight, portalZ];
+		const p3 = [endX, doorHeight, endZ];
+		addPortalQuad(p0,p1,p2,p3,[0,0,1]);
+		addPortalQuad([p0[0],p0[1],p0[2]+thickness],[p1[0],p1[1],p1[2]+thickness],
+			[p2[0],p2[1],p2[2]+thickness],[p3[0],p3[1],p3[2]+thickness],[0,0,-1]);
+	};
+	makeDoorLeaf(hingeLeft, -1);
+	makeDoorLeaf(hingeRight, 1);
+	// Decorative lintel band across the spring line gives the entrance a restrained Persian detail.
+	addPortalBox(portalCenterX - portalRadius - frameDepth * 0.25, pillarHeight - 0.18, portalZ - 0.02,
+		portalCenterX + portalRadius + frameDepth * 0.25, pillarHeight + 0.08, portalZ + frameDepth + 0.02);
 	let elements = Array(position.length / 4)
 		.fill()
 		.flatMap((_, i) => [i * 4, i * 4 + 2, i * 4 + 1, i * 4 + 1, i * 4 + 2, i * 4 + 3]);
