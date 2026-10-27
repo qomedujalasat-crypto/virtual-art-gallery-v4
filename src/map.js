@@ -237,12 +237,12 @@ function genGrid(segments, n, r) {
 
 module.exports = function (n = mapSize, r = cellSize, w = wallThickness, m = wallRemoval, h = mapHeight) {
 	let s = r * Math.pow(2, n);
-	// Use a deliberate U-shaped orthogonal outline. Every corner is 90 degrees,
-	// and each wall run is at least 16 world units (about two painting spaces).
-	// Coordinates are normalized to the square footprint and scaled below.
+	// W-like serpentine gallery outline: three long parallel runs connected
+	// by right-angle turns. Keep the footprint deterministic and avoid diagonal walls.
 	let border = [
-		[0, 0], [1, 0], [1, 1], [2 / 3, 1],
-		[2 / 3, 1 / 3], [1 / 3, 1 / 3], [1 / 3, 1], [0, 1], [0, 0]
+		[0, 0], [1, 0], [1, 1], [3 / 4, 1],
+		[3 / 4, 1 / 4], [1 / 2, 1 / 4], [1 / 2, 1],
+		[1 / 4, 1], [1 / 4, 1 / 4], [0, 1 / 4], [0, 0]
 	].map(([x, y]) => [x * s, y * s]);
 	console.time('gen mesh');
 	let segments = border.slice(0, -1).map((p, i) => [p, border[i + 1]]);
