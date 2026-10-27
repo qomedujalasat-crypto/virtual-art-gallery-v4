@@ -59,14 +59,14 @@ signContext.textBaseline = 'middle';
 signContext.fillStyle = '#f5df9a';
 signContext.shadowColor = 'rgba(0,0,0,0.5)';
 signContext.shadowBlur = 3;
-signContext.font = 'bold 48px Tahoma, Arial, sans-serif';
+signContext.font = 'bold 62px Tahoma, Arial, sans-serif';
 signContext.fillText('دومین جشنواره کشوری', 512, 83, 950);
-signContext.font = 'bold 43px Tahoma, Arial, sans-serif';
+signContext.font = 'bold 54px Tahoma, Arial, sans-serif';
 signContext.fillText('طراحی و دوخت لباس دانش‌آموزی', 512, 174, 950);
 const signTexture = regl.texture({ data: signCanvas, min: 'linear', mag: 'linear', flipY: true });
 const signModel = mat4.identity([]);
-mat4.translate(signModel, signModel, [19.9, 4.74, 0.13]); // Place lettering on the viewer-facing side of the signboard.
-mat4.scale(signModel, signModel, [8.2, 2.05, 1]);
+mat4.translate(signModel, signModel, [19.8, 5.18, 0.17]); // Place lettering on the viewer-facing side of the signboard.
+mat4.scale(signModel, signModel, [8.4, 1.16, 1]);
 const entranceInscription = [{ text: signTexture, textmodel: signModel }];
 
 const context = regl({
