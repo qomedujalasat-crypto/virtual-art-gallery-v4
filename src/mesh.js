@@ -71,7 +71,7 @@ module.exports = (regl, data, useReflexion) => {
                     hillColor = mix(vec3(0.17, 0.36, 0.24), hillColor, smoothstep(farHill - 0.1, farHill + 0.1, v_pos.y));
                     totalLight = mix(hillColor, sky, smoothstep(3.5, 4.6, v_pos.y));
                 } else {
-                bool parkWall = (abs(v_pos.x - 18.24) < 0.09 || abs(v_pos.x - 29.76) < 0.09)
+                bool parkWall = false; // Remove the old flat park-picture panels; corridor walls use the gallery wood finish.
                     && v_pos.z > 0.35 && v_pos.z < 7.85
                     && v_pos.y > 0.72 && v_pos.y < 5.65;
                 bool portalFrame = v_pos.z > -0.15 && v_pos.z < 0.75
