@@ -68,6 +68,7 @@ const reflexion = regl({
 });
 
 // Pick the artwork/flyer under the actual screen coordinate.
+const downloadedThisVisit = new Set();
 // Touch is handled separately because fps.js prevents the browser's synthetic click.
 const activateGalleryItem = (clientX, clientY, mode) => {
 	const clickYaw = fps.fmouse[1] + ((clientX / window.innerWidth) - 0.5) * fovX();
@@ -95,18 +96,22 @@ const activateGalleryItem = (clientX, clientY, mode) => {
 		const score = Math.pow(yawDiff / yawLimit, 2) + Math.pow(pitchDiff / pitchLimit, 2);
 		if (score < bestScore) { best = p; bestScore = score; }
 	}
-	if (!best) {
-		if (mode === 'download') alert('لطفاً دوربین را طوری تنظیم کنید که یک اثر در مرکز صفحه باشد.');
-		return;
-	}
-	if (mode === 'download' && best.isSurveyFlyer) {
-		alert('برای دانلود، دوربین را روی تصویر یک اثر لباس قرار دهید.');
+	// Reject loose angular matches so clicks on empty walls/floor never download anything.
+	if (!best || bestScore > 0.72) {
+		if (mode === 'download') alert('لطفاً یک اثر را دقیقاً در مرکز صفحه قرار دهید.');
 		return;
 	}
 	if (best.isSurveyFlyer) {
-		window.open('https://digiform.ir/wab710d2e6', '_blank', 'noopener,noreferrer');
+		if (mode !== 'download') window.open('https://digiform.ir/wab710d2e6', '_blank', 'noopener,noreferrer');
+		else alert('برای دانلود، یک اثر لباس را انتخاب کنید.');
 		return;
 	}
+	if (mode === 'download' && downloadedThisVisit.has(best.file)) {
+		alert('این اثر در همین بازدید قبلاً دانلود شده است.');
+		return;
+	}
+	if (downloadedThisVisit.has(best.file)) return;
+	downloadedThisVisit.add(best.file);
 	const link = document.createElement('a');
 	link.href = 'images/' + encodeURIComponent(best.file).replace(/%2F/g, '/');
 	link.download = best.file;
