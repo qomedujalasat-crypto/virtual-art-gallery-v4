@@ -262,7 +262,8 @@ module.exports = function (n = mapSize, r = cellSize, w = wallThickness, m = wal
 	const entranceLeft = s * 0.38;
 	const entranceRight = s * 0.62;
 	const corridorLength = 8;
-	segments.push([[entranceLeft, 0], [entranceLeft, corridorLength]]);
+	// Keep the right-hand inner return wall only; the left-hand wall was the
+	// unwanted extra wall beside the entrance when entering from the park.
 	segments.push([[entranceRight, 0], [entranceRight, corridorLength]]);
 	console.time('gen mesh');
 	let normal = segments
@@ -296,7 +297,7 @@ module.exports = function (n = mapSize, r = cellSize, w = wallThickness, m = wal
 	// Keep the entry corridor walls clear for the park panorama instead of placing artworks on them.
 	placements = placements.filter(([[ax, az], [bx, bz]]) => {
 		const cx = (ax + bx) * 0.5, cz = (az + bz) * 0.5;
-		const sideWall = Math.abs(cx - entranceLeft) < 0.2 || Math.abs(cx - entranceRight) < 0.2;
+		const sideWall = Math.abs(cx - entranceRight) < 0.2;
 		return !(sideWall && cz >= 0 && cz <= corridorLength);
 	});
 	//Add floor and ceilling
