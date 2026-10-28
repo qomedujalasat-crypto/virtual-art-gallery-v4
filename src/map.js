@@ -350,8 +350,7 @@ module.exports = function (n = mapSize, r = cellSize, w = wallThickness, m = wal
 		addPortalQuad([p0[0],p0[1],p0[2]+thickness],[p1[0],p1[1],p1[2]+thickness],
 			[p2[0],p2[1],p2[2]+thickness],[p3[0],p3[1],p3[2]+thickness],[0,0,-1]);
 	};
-	makeDoorLeaf(hingeLeft, -1);
-	makeDoorLeaf(hingeRight, 1);
+	// Keep the entrance open; the exhibition title above it is sufficient.
 	// Decorative lintel band across the spring line gives the entrance a restrained Persian detail.
 	addPortalBox(portalCenterX - portalRadius - frameDepth * 0.25, pillarHeight - 0.18, portalZ - 0.02,
 		portalCenterX + portalRadius + frameDepth * 0.25, pillarHeight + 0.08, portalZ + frameDepth + 0.02);
