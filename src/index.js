@@ -66,7 +66,7 @@ signContext.fillText('طراحی و دوخت لباس دانش‌آموزی', 51
 const signTexture = regl.texture({ data: signCanvas, min: 'linear', mag: 'linear', flipY: true });
 // Interior-facing inscription (positive Z side).
 const signModel = mat4.identity([]);
-mat4.translate(signModel, signModel, [15.6, 5.18, 0.59]);
+mat4.translate(signModel, signModel, [24, 5.18, 0.59]);
 mat4.scale(signModel, signModel, [8.4, 1.16, 1]);
 
 // Matching inscription on the exterior-facing side. Rotate the plane 180 degrees
