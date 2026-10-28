@@ -241,9 +241,31 @@ module.exports = function (n = mapSize, r = cellSize, w = wallThickness, m = wal
 	// Alternating door gaps connect the lanes so the visitor walks back and forth.
 	const border = [[0,0],[s,s*0.38],[s,0],[s,s],[0,s],[0,0]].map(([x,y]) => [x,y]);
 	let segments = [
+		// Outer square: the centered opening is the main entrance from the park.
 		[[0,0],[s*0.38,0]], [[s*0.62,0],[s,0]],
 		[[s,0],[s,s]], [[s,s],[0,s]], [[0,s],[0,0]]
 	];
+
+	// Inner square gallery loop. Its front opening aligns with the main entrance,
+	// so visitors can enter the square corridor, walk around all four sides,
+	// and return through the same opening to the entrance sign.
+	const innerInset = s * 0.20;
+	const innerLeft = innerInset;
+	const innerRight = s - innerInset;
+	const innerFront = innerInset;
+	const innerBack = s - innerInset;
+	const innerOpeningHalf = s * 0.105;
+	const innerOpeningLeft = s * 0.5 - innerOpeningHalf;
+	const innerOpeningRight = s * 0.5 + innerOpeningHalf;
+	segments.push(
+		// Inner front wall faces the corridor (toward the entrance / -Z).
+		[[innerOpeningLeft, innerFront], [innerLeft, innerFront]],
+		[[innerRight, innerFront], [innerOpeningRight, innerFront]],
+		// The remaining sides are oriented so their visible faces point into the corridor.
+		[[innerRight, innerFront], [innerRight, innerBack]],
+		[[innerRight, innerBack], [innerLeft, innerBack]],
+		[[innerLeft, innerBack], [innerLeft, innerFront]]
+	);
 	// Simple square gallery: keep the outer perimeter and the central entrance opening.
 	const entranceLeft = s * 0.38;
 	const entranceRight = s * 0.62;
