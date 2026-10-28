@@ -62,11 +62,11 @@ const easeInOutQuad = x =>
 	x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
 
 module.exports = function ({getGridSegments, getGridParts, placements}, fovY) {
-	// Begin just inside the main entrance, facing the 3D portal.
-	// The portal is centered on the front opening at z ~= 0.
+	// Begin just outside the main entrance, facing inward toward the portal.
+	// The exterior park lies at negative Z and the entrance opening is near Z = 0.
 	const mapExtent = 6 * Math.pow(2, 3);
-	let startX = mapExtent * 0.5, startZ = 4.8;
-	let startYaw = -Math.PI / 2;
+	let startX = mapExtent * 0.5, startZ = -4.8;
+	let startYaw = Math.PI / 2;
 	var mouse = [0, startYaw];
 	var fmouse = [0, startYaw];
 	var dir = [0, 0, 0];
