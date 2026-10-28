@@ -282,8 +282,12 @@ module.exports = function (n = mapSize, r = cellSize, w = wallThickness, m = wal
 		[[s * 0.62, 0], [s, 0]]
 	];
 	frontSideWalls.forEach(([[x1, z1], [x2, z2]]) => {
-		position.push([x2, 0, z2], [x2, h, z2], [x1, 0, z1], [x1, h, z1]);
-		const reverseNormal = [Math.sign(z2 - z1), 0, Math.sign(x1 - x2)];
+		// Keep the interior-facing wall surface from `segments` and add a distinct
+		// exterior-facing surface slightly into the park. The small offset avoids
+		// coplanar duplicate faces being lost to depth-buffer z-fighting.
+		const exteriorZ = z1 - 0.04;
+		position.push([x2, 0, exteriorZ], [x2, h, exteriorZ], [x1, 0, exteriorZ], [x1, h, exteriorZ]);
+		const reverseNormal = [0, 0, -1];
 		for (let i = 0; i < 4; i++) normal.push(reverseNormal);
 	});
 	let {getAreaIndex, getGridSegments, getGridParts, placements} = genGrid(segments, n, r);
