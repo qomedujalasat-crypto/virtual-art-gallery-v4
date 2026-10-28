@@ -196,7 +196,8 @@ module.exports = (regl, data, useReflexion) => {
 
         uniforms: {
             wallTexture,
-            floorTexture
+            floorTexture,
+            parkTexture
         },
 
         elements: new Uint32Array(data.elements)
