@@ -60,13 +60,16 @@ module.exports = (regl, data, useReflexion) => {
                 totalLight = mix(totalLight, vec3(0.55, 0.52, 0.47), vein * 0.12);
                 }
             } else {
-                if (v_normal.z > 0.5 && v_pos.z < -29.9) {
-                    // Daylight sky and rolling green horizon; no tree models are needed.
+                if ((v_normal.z > 0.5 && v_pos.z < -29.9)
+                    || (v_normal.x < -0.5 && v_pos.x < 0.01)
+                    || (v_normal.x > 0.5 && v_pos.x > 47.99)) {
+                    // Repeat the blue-sky and green-horizon panorama on the two side walls.
+                    float horizonCoord = abs(v_normal.x) > 0.5 ? v_pos.z : v_pos.x;
                     float skyMix = smoothstep(0.18, 0.95, v_pos.y / 13.0);
                     // Brighter clear daytime sky, with a pale horizon and vivid blue overhead.
                     vec3 sky = mix(vec3(0.91, 0.96, 0.99), vec3(0.20, 0.58, 0.92), skyMix);
-                    float farHill = 3.2 + 0.65 * sin(v_pos.x * 0.17) + 0.28 * sin(v_pos.x * 0.39 + 1.2);
-                    float nearHill = 1.65 + 0.42 * sin(v_pos.x * 0.12 + 1.0) + 0.22 * sin(v_pos.x * 0.31);
+                    float farHill = 3.2 + 0.65 * sin(horizonCoord * 0.17) + 0.28 * sin(horizonCoord * 0.39 + 1.2);
+                    float nearHill = 1.65 + 0.42 * sin(horizonCoord * 0.12 + 1.0) + 0.22 * sin(horizonCoord * 0.31);
                     vec3 hillColor = mix(vec3(0.20, 0.42, 0.25), vec3(0.34, 0.55, 0.31), smoothstep(nearHill - 0.1, nearHill + 0.1, v_pos.y));
                     hillColor = mix(vec3(0.17, 0.36, 0.24), hillColor, smoothstep(farHill - 0.1, farHill + 0.1, v_pos.y));
                     totalLight = mix(hillColor, sky, smoothstep(3.5, 4.6, v_pos.y));
