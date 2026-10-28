@@ -66,13 +66,13 @@ signContext.fillText('طراحی و دوخت لباس دانش‌آموزی', 51
 const signTexture = regl.texture({ data: signCanvas, min: 'linear', mag: 'linear', flipY: true });
 // Interior-facing inscription (positive Z side).
 const signModel = mat4.identity([]);
-mat4.translate(signModel, signModel, [19.8, 5.18, 0.59]);
+mat4.translate(signModel, signModel, [24, 5.18, 0.59]);
 mat4.scale(signModel, signModel, [8.4, 1.16, 1]);
 
 // Matching inscription on the exterior-facing side. Rotate the plane 180 degrees
 // around Y so the Persian text is readable from outside rather than mirrored.
 const signOutsideModel = mat4.identity([]);
-mat4.translate(signOutsideModel, signOutsideModel, [19.8, 5.18, 0.13]);
+mat4.translate(signOutsideModel, signOutsideModel, [24, 5.18, 0.13]);
 mat4.rotateY(signOutsideModel, signOutsideModel, Math.PI);
 mat4.scale(signOutsideModel, signOutsideModel, [8.4, 1.16, 1]);
 
