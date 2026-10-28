@@ -66,13 +66,16 @@ module.exports = (regl, data, useReflexion) => {
                 if ((v_normal.z > 0.5 && v_pos.z < -29.9)
                     || (v_normal.x < -0.5 && v_pos.x < 0.01)
                     || (v_normal.x > 0.5 && v_pos.x > 47.99)) {
-                    // Use the uploaded park photograph instead of the synthetic sky/horizon.
-                    // Map the full wall face to the image and keep UVs within its bounds.
+                    // Restore the reliable procedural park panorama on exterior boundary walls.
+                    // The uploaded photo remains in the repo; this avoids black walls if texture loading fails.
                     float horizonCoord = abs(v_normal.x) > 0.5 ? v_pos.z : v_pos.x;
-                    vec2 parkUV = vec2((horizonCoord + 30.0) / 78.0, v_pos.y / 7.0);
-                    parkUV = clamp(parkUV, vec2(0.0), vec2(1.0));
-                    totalLight = texture2D(parkTexture, parkUV).rgb;
-                } else {
+                    float skyMix = smoothstep(0.18, 0.95, v_pos.y / 13.0);
+                    vec3 sky = mix(vec3(0.91, 0.96, 0.99), vec3(0.20, 0.58, 0.92), skyMix);
+                    float farHill = 3.2 + 0.65 * sin(horizonCoord * 0.17) + 0.28 * sin(horizonCoord * 0.39 + 1.2);
+                    float nearHill = 1.65 + 0.42 * sin(horizonCoord * 0.12 + 1.0) + 0.22 * sin(horizonCoord * 0.31);
+                    vec3 hillColor = mix(vec3(0.20, 0.42, 0.25), vec3(0.34, 0.55, 0.31), smoothstep(nearHill - 0.1, nearHill + 0.1, v_pos.y));
+                    hillColor = mix(vec3(0.17, 0.36, 0.24), hillColor, smoothstep(farHill - 0.1, farHill + 0.1, v_pos.y));
+                    totalLight = mix(hillColor, sky, smoothstep(3.5, 4.6, v_pos.y));                } else {
                 // Disable only the old park-picture panels; keep the wall geometry and wood shader active.
                 bool parkWall = false;
                 bool portalFrame = v_pos.z > -0.15 && v_pos.z < 0.75
