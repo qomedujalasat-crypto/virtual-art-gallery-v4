@@ -64,10 +64,22 @@ signContext.fillText('دومین جشنواره کشوری', 512, 83, 950);
 signContext.font = 'bold 54px Tahoma, Arial, sans-serif';
 signContext.fillText('طراحی و دوخت لباس دانش‌آموزی', 512, 174, 950);
 const signTexture = regl.texture({ data: signCanvas, min: 'linear', mag: 'linear', flipY: true });
+// Interior-facing inscription (positive Z side).
 const signModel = mat4.identity([]);
-mat4.translate(signModel, signModel, [19.8, 5.18, 0.59]); // Place lettering on the viewer-facing side of the signboard.
+mat4.translate(signModel, signModel, [19.8, 5.18, 0.59]);
 mat4.scale(signModel, signModel, [8.4, 1.16, 1]);
-const entranceInscription = [{ text: signTexture, textmodel: signModel }];
+
+// Matching inscription on the exterior-facing side. Rotate the plane 180 degrees
+// around Y so the Persian text is readable from outside rather than mirrored.
+const signOutsideModel = mat4.identity([]);
+mat4.translate(signOutsideModel, signOutsideModel, [19.8, 5.18, 0.13]);
+mat4.rotateY(signOutsideModel, signOutsideModel, Math.PI);
+mat4.scale(signOutsideModel, signOutsideModel, [8.4, 1.16, 1]);
+
+const entranceInscription = [
+	{ text: signTexture, textmodel: signModel },
+	{ text: signTexture, textmodel: signOutsideModel }
+];
 
 const context = regl({
 	cull: {
