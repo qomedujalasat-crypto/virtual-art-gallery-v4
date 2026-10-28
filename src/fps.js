@@ -66,7 +66,7 @@ module.exports = function ({getGridSegments, getGridParts, placements}, fovY) {
 	// The exterior park lies at negative Z and the entrance opening is near Z = 0.
 	const mapExtent = 6 * Math.pow(2, 3);
 	let startX = mapExtent * 0.5, startZ = -4.8;
-	let startYaw = Math.PI / 2;
+	let startYaw = Math.PI; // Turn 90 degrees right from the current exterior view toward the entrance.
 	var mouse = [0, startYaw];
 	var fmouse = [0, startYaw];
 	var dir = [0, 0, 0];
