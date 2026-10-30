@@ -68,7 +68,10 @@ module.exports = (regl, data, useReflexion) => {
                     || (v_normal.x > 0.5 && v_pos.x > 47.99)) {
                     // Use the uploaded park photograph as the outdoor horizon backdrop.
                     // Keep the walkable grass/path ground procedural and unchanged.
-                    vec2 parkUV = vec2(v_pos.x / 48.0, v_pos.y / 13.0);
+                    // Use the full panorama horizontally on the rear wall; map side walls along depth.
+                    vec2 parkUV = (abs(v_normal.z) > 0.5)
+                        ? vec2(v_pos.x / 48.0, v_pos.y / 13.0)
+                        : vec2((v_pos.z + 30.0) / 30.0, v_pos.y / 13.0);
                     totalLight = texture2D(parkTexture, parkUV).rgb;
                 } else {
                 // Disable only the old park-picture panels; keep the wall geometry and wood shader active.
