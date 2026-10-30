@@ -303,10 +303,11 @@ module.exports = function (n = mapSize, r = cellSize, w = wallThickness, m = wal
 		for (let i = 0; i < 4; i++) normal.push(nrm);
 	};
 	addExteriorQuad([0, 0, -parkDepth], [s, 0, -parkDepth], [0, 0, 0], [s, 0, 0], [0, 1, 0]);
-	addExteriorQuad([0, 0, -parkDepth], [0, parkSkyHeight, -parkDepth], [s, 0, -parkDepth], [s, parkSkyHeight, -parkDepth], [0, 0, 1]);
+	// Face the rear panorama toward the visitor standing outside the entrance.
+	addExteriorQuad([0, 0, -parkDepth], [s, 0, -parkDepth], [0, parkSkyHeight, -parkDepth], [s, parkSkyHeight, -parkDepth], [0, 0, -1]);
 	// Extend the same horizon backdrop along the left and right sides of the park approach.
-	addExteriorQuad([0, 0, 0], [0, parkSkyHeight, 0], [0, 0, -parkDepth], [0, parkSkyHeight, -parkDepth], [-1, 0, 0]);
-	addExteriorQuad([s, 0, -parkDepth], [s, parkSkyHeight, -parkDepth], [s, 0, 0], [s, parkSkyHeight, 0], [1, 0, 0]);
+	addExteriorQuad([0, 0, 0], [0, 0, -parkDepth], [0, parkSkyHeight, 0], [0, parkSkyHeight, -parkDepth], [-1, 0, 0]);
+	addExteriorQuad([s, 0, -parkDepth], [s, 0, 0], [s, parkSkyHeight, -parkDepth], [s, parkSkyHeight, 0], [1, 0, 0]);
 
 	// Three-dimensional Iranian-style entrance portal at the open gap in the front wall.
 	// This geometry is rendered in the gallery itself, independently of the welcome overlay.
